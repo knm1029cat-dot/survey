@@ -1,119 +1,96 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
-<meta charset="UTF-8">
-<title>仕事に関するアンケート</title>
-<style>
-body {
-  font-family: 'Segoe UI', sans-serif;
-  max-width: 700px;
-  margin: 30px auto;
-  padding: 0 20px;
-  background: #f5f5f5;
-}
-h1 { text-align: center; color: #333; }
-textarea { width: 100%; height: 120px; padding: 10px; font-size: 16px; border-radius: 5px; border: 1px solid #ccc; }
-button { margin-top: 10px; padding: 8px 15px; font-size: 15px; border-radius: 5px; border: none; cursor: pointer; background-color: #4CAF50; color: white; }
-button:hover { background-color: #45a049; }
-.answer { background: white; border-radius: 5px; padding: 10px; margin: 10px 0; box-shadow: 0 0 4px rgba(0,0,0,0.1); display:flex; justify-content:space-between; align-items:center; }
-.delete-btn { background-color:#f44336; padding:5px 10px; font-size:14px; border-radius:5px; }
-.delete-btn:hover { background-color:#e53935; }
-#adminSection { margin-top: 30px; }
-#passwordInput { width: 200px; margin-right: 10px; padding: 5px; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>仕事に関する匿名アンケート</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      max-width: 700px;
+      margin: 30px auto;
+      padding: 0 20px;
+      background: #f5f5f5;
+    }
+
+    .card {
+      background: white;
+      padding: 24px;
+      border-radius: 10px;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.08);
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    p {
+      color: #555;
+      line-height: 1.8;
+      margin-bottom: 18px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 150px;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+      resize: vertical;
+    }
+
+    button {
+      margin-top: 12px;
+      padding: 10px 16px;
+      font-size: 15px;
+      border-radius: 5px;
+      border: none;
+      cursor: pointer;
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    .note {
+      margin-top: 14px;
+      font-size: 13px;
+      color: #666;
+      line-height: 1.6;
+    }
+  </style>
 </head>
 <body>
+  <div class="card">
+    <h1>仕事に関する匿名アンケート</h1>
 
-<h1>仕事に関するアンケート</h1>
+    <p>
+      職場をより働きやすくするためのアンケートです。<br>
+      困っていること、改善してほしいこと、感じていることがあれば自由にご記入ください。<br>
+      匿名なので、率直な意見を書いていただいて大丈夫です。
+    </p>
 
-<textarea id="answerInput" placeholder="自由に書いてください"></textarea>
-<br>
-<button onclick="submitAnswer()">送信</button>
+    <form action="https://formsubmit.co/knm1029.cat@gmail.com" method="POST">
+      <textarea name="answer" placeholder="自由に書いてください" required></textarea>
 
-<div id="adminSection">
-  <h2>管理者用回答閲覧</h2>
-  <input type="password" id="passwordInput" placeholder="パスワード">
-  <button id="showBtn">表示</button>
-  <div id="answersContainer"></div>
-</div>
+      <input type="hidden" name="_subject" value="仕事に関する匿名アンケートの新しい回答">
+      <input type="hidden" name="_captcha" value="false">
+      <input type="hidden" name="_template" value="table">
+      <input type="hidden" name="_next" value="https://km1029cat-dot.github.io/survey/">
 
-<script>
-// 管理者パスワード
-const ADMIN_PASSWORD = "admin123";
+      <button type="submit">送信</button>
+    </form>
 
-// localStorageキー
-const STORAGE_KEY = "anonymousSurveyAnswers";
-
-// 回答取得
-function getAnswers() {
-  return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-}
-
-// 回答保存
-function saveAnswers(data) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-}
-
-// 回答送信
-function submitAnswer() {
-  const text = document.getElementById("answerInput").value.trim();
-  if(!text) {
-    alert("入力してください");
-    return;
-  }
-  const answers = getAnswers();
-  answers.push({ text: text });
-  saveAnswers(answers);
-  document.getElementById("answerInput").value = "";
-  alert("送信しました。ありがとうございます！");
-}
-
-// 回答表示（管理者用）
-function showAnswers() {
-  const password = document.getElementById("passwordInput").value;
-  if(password !== ADMIN_PASSWORD) {
-    alert("パスワードが違います！");
-    return;
-  }
-  const answers = getAnswers();
-  const container = document.getElementById("answersContainer");
-  container.innerHTML = "";
-  if(answers.length === 0){
-    container.innerHTML = "<p>まだ回答はありません。</p>";
-    return;
-  }
-  answers.slice().reverse().forEach((a, index) => {
-    const div = document.createElement("div");
-    div.className = "answer";
-    div.innerHTML = `<div>${a.text}</div>`;
-    const delBtn = document.createElement("button");
-    delBtn.className = "delete-btn";
-    delBtn.textContent = "削除";
-    delBtn.onclick = () => deleteAnswer(answers.length - 1 - index);
-    div.appendChild(delBtn);
-    container.appendChild(div);
-  });
-}
-
-// 回答削除
-function deleteAnswer(index) {
-  if(!confirm("この回答を削除しますか？")) return;
-  const answers = getAnswers();
-  answers.splice(index, 1);
-  saveAnswers(answers);
-  showAnswers(); // 更新
-}
-
-// Enterキーで表示
-document.getElementById("passwordInput").addEventListener("keydown", function(e){
-  if(e.key === "Enter") {
-    showAnswers();
-  }
-});
-
-// ボタンにもイベント
-document.getElementById("showBtn").addEventListener("click", showAnswers);
-</script>
-
+    <div class="note">
+      ※氏名入力欄はありません。<br>
+      ※送信内容は管理者側で確認します。
+    </div>
+  </div>
 </body>
 </html>
